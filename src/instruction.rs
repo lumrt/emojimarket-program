@@ -4,6 +4,19 @@ use borsh::{BorshDeserialize, BorshSerialize};
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub enum EmojimarketInstruction 
 {
+
+	/// Create a new prediction post / market
+     	/// Accounts expected:
+	
+	/// 0. `[signer]` Creator / payer
+	/// 1. `[writable]` Post account PDA (derived with seeds ["post", post_id])
+	/// 2. `[writable]` Escrow token account PDA (derived with seeds ["escrow", post_id])
+	/// 3. `[]` USDC mint account
+	/// 4. `[]` System program
+	/// 5. `[]` SPL Token program
+	/// 6. `[]` Rent sysvar
+
+
 	/// Create a post
 	/// Accounts: payer (signer), post_pda (write), escrow_token_account (write), system_program, token_program, rent
 	CreatePost {
@@ -14,7 +27,15 @@ pub enum EmojimarketInstruction
 		cid: String,
 	},
 
-
+	/// 0. `[signer]` Bettor
+	/// 1. `[writable]` Bettor's SPL token account (USDC)
+	/// 2. `[writable]` Escrow SPL token account PDA (["escrow", post_id])
+	/// 3. `[writable]` Post account PDA (["post", post_id])
+	/// 4. `[writable]` Bet account PDA (["bet", post_id, bettor_pubkey])
+	/// 5. `[]` USDC mint (same as escrow & bettor token account mint)
+	/// 6. `[]` SPL Token program
+	/// 7. `[]` Clock sysvar
+	
 	/// Place a bet
 	/// Accounts: bettor (signer), bettor_token_account, escrow_token_account, post_pda , bet_pda, token_program, clock
 	PlaceBet

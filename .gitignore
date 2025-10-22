@@ -1,0 +1,14 @@
+.node_modules
+.target
+.test-ledger
+.usdc_mint.json
+.id.json
+.validator.log
+.test_output.log
+.tx_output.log
+.test-ledger
+.usdc_mint.json
+.id.json
+.validator.log
+.test_output.log
+.tx_output.log

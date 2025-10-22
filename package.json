@@ -1,0 +1,26 @@
+{
+  "name": "emojimarket-program",
+  "version": "1.0.0",
+  "description": "- Implement SPL Token CPI transfers (create escrow token account per post, mint check for USDC) // current - Implement on-chain pricing math: store per-emoji supplies in `Post` or a separate PDA and compute exponential price with u128 fixed-point - Implement ResolveMarket flow with either batched payouts or per-user claim entitlements (recommended: pull pattern) - Add rent-exempt account creation helper functions - Add comprehensive unit tests for price math and handlers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lumrt/emojimarket-program.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lumrt/emojimarket-program/issues"
+  },
+  "homepage": "https://github.com/lumrt/emojimarket-program#readme",
+  "dependencies": {
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4",
+    "borsh": "^2.0.0"
+  }
+}

@@ -12,6 +12,7 @@ TEST_POST_ID=1
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
+RED='\033[0;31m'
 NC='\033[0m'
 
 # === START ===
@@ -35,8 +36,23 @@ solana-test-validator \
   --reset \
   --ledger ./.test-ledger \
   --limit-ledger-size 500 \
+  --quiet \
   > ./.test-ledger/validator.log 2>&1 &
-sleep 5
+
+# Wait for validator to be ready
+echo -e "${YELLOW}⏳ Waiting for validator to start...${NC}"
+sleep 3
+for i in {1..30}; do
+  if solana cluster-version >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Validator is ready${NC}"
+    break
+  fi
+  sleep 1
+  if [ $i -eq 30 ]; then
+    echo -e "${RED}❌ Validator failed to start${NC}"
+    exit 1
+  fi
+done
 
 # 4️⃣ Set config to localnet
 solana config set --url localhost >/dev/null

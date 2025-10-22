@@ -6,6 +6,7 @@ import {
   Transaction,
   TransactionInstruction,
   sendAndConfirmTransaction,
+  SYSVAR_RENT_PUBKEY,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -13,39 +14,55 @@ import {
   getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
 import * as fs from "fs";
-import * as borsh from "borsh";
+import { Buffer } from "buffer";
 
 const PROGRAM_PATH = "target/deploy/emojimarket_program-keypair.json";
-const LOCAL_USDC_PATH = "./usdc_mint.json"; // pour stocker ton mint
-const LOCAL_WALLET_PATH = "~/.config/solana/id.json";
+const LOCAL_USDC_PATH = "./usdc_mint.json";
 const LOCAL_RPC = "http://127.0.0.1:8899";
 
-// ------------------ STRUCT BORSH ------------------
-class CreatePost {
-	post_id: bigint = BigInt(0);
-	start_ts: bigint = BigInt(0);
-	end_ts: bigint = BigInt(0);
-	creator_fee_bps: number = 0;
-	cid: string = "";
-	constructor(fields: Partial<CreatePost>) {
-		Object.assign(this, fields);
-	}
+// Helper to encode instruction data manually
+function encodeCreatePostInstruction(
+  postId: bigint,
+  startTs: bigint,
+  endTs: bigint,
+  creatorFeeBps: number,
+  cid: string
+): Buffer {
+  // Instruction discriminator (0 for CreatePost)
+  const discriminator = Buffer.alloc(1);
+  discriminator.writeUInt8(0, 0);
+  
+  // post_id (u64)
+  const postIdBuf = Buffer.alloc(8);
+  postIdBuf.writeBigUInt64LE(postId, 0);
+  
+  // start_ts (i64)
+  const startTsBuf = Buffer.alloc(8);
+  startTsBuf.writeBigInt64LE(startTs, 0);
+  
+  // end_ts (i64)
+  const endTsBuf = Buffer.alloc(8);
+  endTsBuf.writeBigInt64LE(endTs, 0);
+  
+  // creator_fee_bps (u16)
+  const feeBuf = Buffer.alloc(2);
+  feeBuf.writeUInt16LE(creatorFeeBps, 0);
+  
+  // cid (string) - borsh string: u32 length + utf8 bytes
+  const cidBytes = Buffer.from(cid, "utf8");
+  const cidLenBuf = Buffer.alloc(4);
+  cidLenBuf.writeUInt32LE(cidBytes.length, 0);
+  
+  return Buffer.concat([
+    discriminator,
+    postIdBuf,
+    startTsBuf,
+    endTsBuf,
+    feeBuf,
+    cidLenBuf,
+    cidBytes
+  ]);
 }
-const CreatePostSchema = new Map([
-  [
-    CreatePost,
-    {
-      kind: "struct",
-      fields: [
-        ["post_id", "u64"],
-        ["start_ts", "i64"],
-        ["end_ts", "i64"],
-        ["creator_fee_bps", "u16"],
-        ["cid", "string"],
-      ],
-    },
-  ],
-]);
 
 // ------------------ MAIN SCRIPT ------------------
 (async () => {
@@ -58,12 +75,17 @@ const CreatePostSchema = new Map([
   const programId = programKeypair.publicKey;
   console.log("🧠 Program ID:", programId.toBase58());
 
-  // Load wallet
-  const walletKeypair = Keypair.fromSecretKey(
-    Uint8Array.from(JSON.parse(fs.readFileSync(
-      LOCAL_WALLET_PATH.replace("~", process.env.HOME || ""), "utf8"
-    )))
-  );
+  // Load wallet - try default location or create new keypair for testing
+  let walletKeypair: Keypair;
+  const walletPath = `${process.env.HOME}/.config/solana/id.json`;
+  try {
+    walletKeypair = Keypair.fromSecretKey(
+      Uint8Array.from(JSON.parse(fs.readFileSync(walletPath, "utf8")))
+    );
+  } catch (e) {
+    console.log("⚠️  No wallet found, using program keypair as payer for demo");
+    walletKeypair = programKeypair;
+  }
   console.log("👤 Wallet:", walletKeypair.publicKey.toBase58());
 
   // Load or create mock USDC mint
@@ -86,16 +108,13 @@ const CreatePostSchema = new Map([
   console.log("📦 Post PDA  :", postPda.toBase58());
   console.log("💼 Escrow PDA:", escrowPda.toBase58());
 
-  // Build instruction data (borsh encode)
-  const instructionData = borsh.serialize(
-    CreatePostSchema as unknown as borsh.Schema,
-    new CreatePost({
-      post_id: BigInt(postId),
-      start_ts: BigInt(Math.floor(Date.now() / 1000)),
-      end_ts: BigInt(Math.floor(Date.now() / 1000) + 3600),
-      creator_fee_bps: 500, // 5%
-      cid: "QmFakeCIDExampleForTest123",
-    })
+  // Build instruction data
+  const instructionData = encodeCreatePostInstruction(
+    BigInt(postId),
+    BigInt(Math.floor(Date.now() / 1000)),
+    BigInt(Math.floor(Date.now() / 1000) + 3600),
+    500, // 5%
+    "QmFakeCIDExampleForTest123"
   );
 
   // Build instruction
@@ -108,15 +127,9 @@ const CreatePostSchema = new Map([
       { pubkey: usdcMint, isSigner: false, isWritable: false },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-      { pubkey: PublicKey.findProgramAddressSync(
-          [Buffer.from("SysvarRent111111111111111111111111111111111"),],
-          SystemProgram.programId
-        )[0],
-        isSigner: false,
-        isWritable: false,
-      },
+      { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     ],
-    data: Buffer.from(Uint8Array.from(instructionData)),
+    data: instructionData,
   });
 
   // Send transaction

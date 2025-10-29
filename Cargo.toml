@@ -27,3 +27,6 @@ anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
 solana-program-test = "1.18.22"
 solana-sdk = "1.18.22"
 spl-token = "4.0.0"
+
+[profile.release]
+overflow-checks = true

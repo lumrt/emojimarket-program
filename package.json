@@ -6,7 +6,12 @@
   "scripts": {
     "test": "ts-node scripts/test_emoji_market.ts",
     "test:program": "ts-node scripts/test_program.ts",
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "deploy:devnet": "./deploy-devnet.sh",
+    "client": "ts-node scripts/client.ts",
+    "client:example": "ts-node scripts/example-usage.ts",
+    "example": "ts-node scripts/example-usage.ts",
+    "program-info": "./show-program-info.sh"
   },
   "repository": {
     "type": "git",
@@ -26,7 +31,7 @@
   },
   "homepage": "https://github.com/lumrt/emojimarket-program#readme",
   "dependencies": {
-    "@coral-xyz/anchor": "^0.30.1",
+    "@coral-xyz/anchor": "^0.31.0",
     "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
     "borsh": "^2.0.0"

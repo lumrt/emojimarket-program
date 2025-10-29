@@ -7,7 +7,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("4Rp6sVke1a1PRxhQhZJvFbgArcy3AokWQYLrKsBvrcmR");
+declare_id!("ZTnFhxro4BiVWvAhH6m11SJx4BUDieP2Vu4yYymco1u");
 
 #[program]
 pub mod emojimarket_program {

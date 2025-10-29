@@ -1,0 +1,17 @@
+{
+  "cluster": "devnet",
+  "programId": "ZTnFhxro4BiVWvAhH6m11SJx4BUDieP2Vu4yYymco1u",
+  "walletPath": "~/.config/solana/id.json",
+  "rpcUrl": "",
+  "config": {
+    "platformFeeBps": 250,
+    "creatorFeeBps": 250,
+    "basePriceLamports": "1000000",
+    "malusKMillis": 500,
+    "quadAMicros": "1000",
+    "quadBMicros": "2000",
+    "minDurationSecs": 60,
+    "maxDurationSecs": 604800
+  }
+}
+

@@ -3,15 +3,27 @@ name = "emojimarket_program"
 version = "0.1.0"
 edition = "2021"
 
+[lints.rust]
+unexpected_cfgs = "allow"
+ambiguous_glob_reexports = "allow"
+
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib", "lib"]
+name = "emojimarket_program"
 
 [features]
 no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
 
 [dependencies]
-solana-program = "=1.18.22"
-thiserror = "1.0"
-borsh = "=0.10.3"
-spl-token = { version = "=4.0.0", features = ["no-entrypoint"] }
-indexmap = "=2.6.0"
+anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
+anchor-spl = "0.30.1"
+
+[dev-dependencies]
+anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
+solana-program-test = "1.18.22"
+solana-sdk = "1.18.22"
+spl-token = "4.0.0"

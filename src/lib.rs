@@ -1,23 +1,68 @@
-//! emojimarket_program: minimal Solana program skeleton (no Framework)
+use anchor_lang::prelude::*;
 
+pub mod error;
+pub mod instructions;
+pub mod math;
 pub mod state;
-pub mod instruction;
-pub mod processor;
 
-#[cfg(not(feature = "no-entrypoint"))]
-use solana_program::entrypoint;
+use instructions::*;
 
-use solana_program::entrypoint::ProgramResult;
-use solana_program::pubkey::Pubkey;
+declare_id!("4Rp6sVke1a1PRxhQhZJvFbgArcy3AokWQYLrKsBvrcmR");
 
-#[cfg(not(feature = "no-entrypoint"))]
-entrypoint!(process_instruction);
+#[program]
+pub mod emojimarket_program {
+    use super::*;
 
-pub fn process_instruction(
-	program_id: &Pubkey,
-	accounts: &[solana_program::account_info::AccountInfo],
-	input: &[u8],
-) -> ProgramResult 
-{
-	processor::process(program_id, accounts, input)
+    pub fn initialize_config(
+        ctx: Context<InitializeConfig>,
+        admin_address: Pubkey,
+        platform_fee_bps: u16,
+        creator_fee_bps: u16,
+        base_price_lamports: u64,
+        malus_k_millis: u32,
+        quad_a_micros: u64,
+        quad_b_micros: u64,
+        min_duration_secs: u32,
+        max_duration_secs: u32,
+    ) -> Result<()> {
+        instructions::initialize_config::handler(
+            ctx,
+            admin_address,
+            platform_fee_bps,
+            creator_fee_bps,
+            base_price_lamports,
+            malus_k_millis,
+            quad_a_micros,
+            quad_b_micros,
+            min_duration_secs,
+            max_duration_secs,
+        )
+    }
+
+    pub fn create_market(
+        ctx: Context<CreateMarket>,
+        market_id: u64,
+        title: String,
+        image_url: Option<String>,
+        end_ts: i64,
+    ) -> Result<()> {
+        instructions::create_market::handler(ctx, market_id, title, image_url, end_ts)
+    }
+
+    pub fn bet(
+        ctx: Context<PlaceBet>,
+        _market_id: u64,
+        emoji_id: u32,
+        vote_qty: u64,
+    ) -> Result<()> {
+        instructions::bet::handler(ctx, emoji_id, vote_qty)
+    }
+
+    pub fn end_market(ctx: Context<EndMarket>, _market_id: u64) -> Result<()> {
+        instructions::end_market::handler(ctx)
+    }
+
+    pub fn claim(ctx: Context<Claim>, _market_id: u64) -> Result<()> {
+        instructions::claim::handler(ctx)
+    }
 }

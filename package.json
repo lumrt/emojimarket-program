@@ -1,16 +1,23 @@
 {
   "name": "emojimarket-program",
   "version": "1.0.0",
-  "description": "- Implement SPL Token CPI transfers (create escrow token account per post, mint check for USDC) // current - Implement on-chain pricing math: store per-emoji supplies in `Post` or a separate PDA and compute exponential price with u128 fixed-point - Implement ResolveMarket flow with either batched payouts or per-user claim entitlements (recommended: pull pattern) - Add rent-exempt account creation helper functions - Add comprehensive unit tests for price math and handlers",
+  "description": "Emoji Market - A prediction market program on Solana where users bet on emojis with SOL",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-node scripts/test_emoji_market.ts",
+    "test:program": "ts-node scripts/test_program.ts",
+    "build": "./build.sh"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lumrt/emojimarket-program.git"
   },
-  "keywords": [],
+  "keywords": [
+    "solana",
+    "anchor",
+    "prediction-market",
+    "emoji"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -19,8 +26,14 @@
   },
   "homepage": "https://github.com/lumrt/emojimarket-program#readme",
   "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
     "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
     "borsh": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
   }
 }

@@ -1,12 +1,35 @@
-node_modules/
+# Anchor & Solana
+.anchor/
+.DS_Store
 target/
+**/*.rs.bk
+test-ledger/
 .test-ledger/
-usdc_mint.json
-id.json
+.solana/
+
+# Node
+node_modules/
+.yarn/
+.npm/
+
+# Logs
+*.log
 validator.log
 test_output.log
 tx_output.log
-*.log
+
+# Generated files
+usdc_mint.json
 Cargo.lock
-package-lock.json
-pnpm-lock.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Keys (IMPORTANT: Never commit private keys!)
+id.json
+*.json.keypair
+**/*-keypair.json
